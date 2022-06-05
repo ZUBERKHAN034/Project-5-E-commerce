@@ -36,7 +36,7 @@ const registerUser = async function (req, res) {
         // Checking E-mail for Uniqueness
         const isEmailAlreadyPresent = await userModel.findOne({ email: email })
         if (isEmailAlreadyPresent) {
-            return res.status(400).send({ status: false, message: "Email already present!" });
+            return res.status(409).send({ status: false, message: "Email already present!" });
         }
 
         // Indian type phone number validation
@@ -46,7 +46,7 @@ const registerUser = async function (req, res) {
         // Checking phone number for uniqueness
         const isPhoneAlreadyPresent = await userModel.findOne({ phone: phone })
         if (isPhoneAlreadyPresent) {
-            return res.status(400).send({ status: false, message: "Phone number already present!" });
+            return res.status(409).send({ status: false, message: "Phone number already present!" });
         }
 
         // Checking the length of password
@@ -144,14 +144,14 @@ const loginUser = async function (req, res) {
 
         // Checking User exists or not
         if (!user) {
-            return res.status(401).send({ status: false, message: "The email address you entered isn't connected to an account. Register a new user first." });
+            return res.status(404).send({ status: false, message: "The email address you entered isn't connected to an account. Register a new user first." });
         }
 
         //Decrypt password by Bcrypt and Compare the password with password from request body
         const decrypPassword = user.password
         const pass = await bcrypt.compare(password, decrypPassword)
         if (!pass) {
-            return res.status(400).send({ status: false, message: "Password Incorrect" })
+            return res.status(401).send({ status: false, message: "Password Incorrect" })
         }
 
         // JWT token creation for authentication of other APIs
@@ -263,7 +263,7 @@ const updateUserProfile = async function (req, res) {
             // Checking E-mail for Uniqueness
             const isEmailAlreadyPresent = await userModel.findOne({ email: email })
             if (isEmailAlreadyPresent) {
-                return res.status(400).send({ status: false, message: `${email} is already present!` });
+                return res.status(409).send({ status: false, message: `${email} is already present!` });
             }
 
             upadteFields["email"] = email;
@@ -279,7 +279,7 @@ const updateUserProfile = async function (req, res) {
             // Checking phone number for uniqueness
             const isPhoneAlreadyPresent = await userModel.findOne({ phone: phone })
             if (isPhoneAlreadyPresent) {
-                return res.status(400).send({ status: false, message: Phone `${phone} is already present!` });
+                return res.status(409).send({ status: false, message: Phone `${phone} is already present!` });
             }
 
             upadteFields["phone"] = phone;
@@ -295,7 +295,7 @@ const updateUserProfile = async function (req, res) {
             // if old password is same as new password
             const isSamePassword = await bcrypt.compare(password, isUserPresent.password);
             if (isSamePassword) {
-                return res.status(400).send({ status: false, message: "entered password is same as old password" })
+                return res.status(401).send({ status: false, message: "entered password is same as old password" })
             }
 
             //Encrypting Password by Bcrypt package

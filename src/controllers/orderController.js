@@ -25,10 +25,10 @@ const createOrder = async function (req, res) {
 
         let usercartid = await userModel.findOne({ _id: userId });
         if (!usercartid) {
-            return res.status(400).send({ status: false, msg: "No such user found. Please register and try again" });
+            return res.status(404).send({ status: false, msg: "No such user found. Please register and try again" });
         }
         if (usercartid._id.toString() !== userIdFromToken) {
-            res.status(401).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
+            res.status(403).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
             return
         }
 
@@ -36,14 +36,14 @@ const createOrder = async function (req, res) {
         let existCart = await cartModel.findOne({ userId: userId })
 
         if (!existCart) {
-            return res.status(400).send({ status: false, msg: "No cart found for respective user" });
+            return res.status(404).send({ status: false, msg: "No cart found for respective user" });
         }
 
 
         const { items, totalPrice, totalItems } = existCart
 
         if (totalItems == 0) {
-            return res.status(202).send({ status: false, msg: "Order Alredy placed from this cart Or cart is empty" });
+            return res.status(202).send({ status: false, msg: "Order Already placed from this cart Or cart is empty" });
         }
 
         let totalQuantity = items.map(x => x.quantity).reduce((a, b) => a + b);
@@ -93,11 +93,11 @@ const updateOrder = async function (req, res) {
 
         let usercartid = await userModel.findOne({ _id: userId });
         if (!usercartid) {
-            return res.status(400).send({ status: false, msg: "No such user found. Please register and try again" });
+            return res.status(404).send({ status: false, msg: "No such user found. Please register and try again" });
         }
         
         if (usercartid._id.toString() !== userIdFromToken) {
-            res.status(401).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
+            res.status(403).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
             return
         }
 
@@ -112,7 +112,7 @@ const updateOrder = async function (req, res) {
         let orderCartid = await orderModel.findById({ _id: orderId });
       
         if (!orderCartid) {
-            return res.status(400).send({ status: false, msg: "No such order found. Please register and try again" });
+            return res.status(404).send({ status: false, msg: "No such order found. Please register and try again" });
         }
         if (!isValid(status)) {
             return res.status(400).send({ status: false, message: "Invalid request parameters. status is required" });

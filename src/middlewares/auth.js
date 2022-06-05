@@ -15,21 +15,18 @@ const authentication = async function (req, res, next) {
         let tokenArray = tokenWithBearer.split(" ");
         //accessing the 2nd postion element by using index[1]
         let token = tokenArray[1];
-       // console.log(token)
-
-      
-        
+             
 
         jwt.verify(token, "Group-33", { ignoreExpiration: true }, function (error, decodedToken) {
             // if token is not valid
             if (error) {
-                return res.status(400).send({ status: false, msg: "Token is invalid!" });
+                return res.status(401).send({ status: false, msg: "Token is invalid!" });
 
                 // if token is valid
             } else {
                 // checking if token session expired
                 if (Date.now() > decodedToken.exp * 1000) {
-                    return res.status(401).send({ status: false, msg: "Session Expired" });
+                    return res.status(440).send({ status: false, msg: "Session Expired" });
                 }
                 //exposing decoded token userId in request for everywhere access
                 req.userId = decodedToken.userId;

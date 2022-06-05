@@ -37,7 +37,7 @@ const createCart = async function (req, res) {
         }
 
         if (isUserIdExists._id.toString() !== userIdFromToken) {
-            res.status(401).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
+            res.status(403).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
             return
         }
 
@@ -50,7 +50,7 @@ const createCart = async function (req, res) {
 
         let product = await productModel.findOne({ _id: productId, isDeleted: false })
         if (!product) {
-            return res.status(400).send({ status: false, message: `No such product present ,unable to add product ${productId} to cart.` })
+            return res.status(404).send({ status: false, message: `No such product present ,unable to add product ${productId} to cart.` })
         }
 
         if (requestBody.hasOwnProperty('quantity')) {
@@ -145,10 +145,10 @@ const updateCart = async function (req, res) {
 
         let user = await userModel.findOne({ _id: userId })
         if (!user) {
-            return res.status(400).send({ status: false, message: "UserId does not exits" })
+            return res.status(404).send({ status: false, message: "User does not exits" })
         }
         if (user._id.toString() !== userIdFromToken) {
-            res.status(401).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
+            res.status(403).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
             return
         }
         //authorization
@@ -166,7 +166,7 @@ const updateCart = async function (req, res) {
         let cart = await cartModel.findById({ _id: cartId })
 
         if (!cart) {
-            return res.status(400).send({ status: false, message: "cartId does not exits" })
+            return res.status(404).send({ status: false, message: "cart does not exits" })
         }
         //product
         if (!isValidObjectId(productId)) {
@@ -175,13 +175,13 @@ const updateCart = async function (req, res) {
 
         let product = await productModel.findOne({ _id: productId, isDeleted: false })
         if (!product) {
-            return res.status(400).send({ status: false, message: "productId does not exits" })
+            return res.status(404).send({ status: false, message: "productId does not exits" })
         }
         //find if products exits in cart
         let isProductinCart = await cartModel.findOne({ items: { $elemMatch: { productId: productId } } })
 
         if (!isProductinCart) {
-            return res.status(400).send({ status: false, message: `This ${productId} product does not exits in the cart` })
+            return res.status(404).send({ status: false, message: `This ${productId} product does not exits in the cart` })
         }
 
         //removeProduct validation
@@ -252,11 +252,11 @@ const getCartByUserId = async function (req, res) {
         }
         let user = await userModel.findOne({ _id: userId })
         if (!user) {
-            return res.status(400).send({ status: false, msg: "No such user found. Please register and try again" });
+            return res.status(404).send({ status: false, msg: "No such user found. Please register and try again" });
         }
         let usercartid = await cartModel.findOne({ userId: userId });
         if (!usercartid) {
-            return res.status(400).send({ status: false, msg: "No such cart found. Please register and try again" });
+            return res.status(404).send({ status: false, msg: "No such cart found. Please register and try again" });
         }
         if (user._id.toString() !== userIdFromToken) {
             res.status(401).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
@@ -287,18 +287,18 @@ const deleteCartByUserId = async function (req, res) {
 
         let Userdata = await userModel.findOne({ _id: userId })
         if (!Userdata) {
-            return res.status(400).send({ status: false, msg: "No such user exists with this userID" });
+            return res.status(404).send({ status: false, msg: "No such user exists with this userID" });
         }
         if (Userdata._id.toString() !== userIdFromToken) {
-            res.status(401).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
+            res.status(403).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
             return
         }
         let usercart = await cartModel.findOne({ userId: userId })
         if (!usercart) {
-            return res.status(400).send({ status: false, msg: "No such user found. Please register and try again" });
+            return res.status(404).send({ status: false, msg: "No such user found. Please register and try again" });
         }
         let updatedUserCart = await cartModel.findOneAndUpdate({ userId: userId }, { items: [], totalPrice: 0, totalItems: 0 }, { new: true })
-        return res.status(204).send({ status: true })
+        return res.status(204).send({ status: true,message:"Empty Cart" })
     }
     catch (error) {
         console.log(error)

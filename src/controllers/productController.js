@@ -21,7 +21,7 @@ const createProduct = async function (req, res) {
 
         const isTitleAlreadyPresent = await productModel.findOne({ title: title })
         if (isTitleAlreadyPresent) {
-            return res.status(400).send({ status: false, message: `${title} is already used by another product!` });
+            return res.status(409).send({ status: false, message: `${title} is already used by another product!` });
         }
 
         if (!isValid(description)) {
@@ -243,7 +243,7 @@ const updateProduct = async function (req, res) {
 
             const isTitleAlreadyUsed = await productModel.findOne({ title: title });
             if (isTitleAlreadyUsed) {
-                return res.status(400).send({ status: false, message: `${title} title is already present` })
+                return res.status(409).send({ status: false, message: `${title} title is already present` })
             }
             updatedProductData['title'] = title;
         }
@@ -351,7 +351,7 @@ const deleteProductById = async function (req, res) {
 
         //if the attribute isDeleted:true , then it is already deleted.
         if (findProduct.isDeleted == true) {
-            return res.status(400).send({ status: false, message: `Product has been already deleted.` })
+            return res.status(404).send({ status: false, message: `Product has been already deleted.` })
         }
 
         //if attribute isDeleted:false, then change the isDeleted flag to true, and remove all the reviews of the book as well.
